@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
@@ -19,6 +20,18 @@ interface YearlyComparisonProps {
 }
 
 export default function YearlyComparison({ allCoursesData, triatlonData }: YearlyComparisonProps) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const calculateEvolution = (current: number, previous: number | undefined) => {
     if (!previous) return null;
     return ((current - previous) / previous) * 100;
@@ -49,28 +62,28 @@ export default function YearlyComparison({ allCoursesData, triatlonData }: Yearl
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px]">
+            <table className="w-full">
               <thead className={`${bgColor} text-white`}>
                 <tr>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
                     Année
                   </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                  <th className="hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-right text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
                     Coureurs
                   </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
                     CA
                   </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
                     Acheteurs
                   </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                  <th className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-right text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
                     CA/coureur
                   </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                  <th className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-right text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
                     % ach.
                   </th>
-                  <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                  <th className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-right text-[9px] sm:text-xs font-semibold uppercase tracking-wider">
                     Panier moy.
                   </th>
                 </tr>
@@ -82,13 +95,13 @@ export default function YearlyComparison({ allCoursesData, triatlonData }: Yearl
 
                   return (
                     <tr key={yearData.year} className="hover:bg-gray-50">
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-900">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm font-bold text-gray-900">
                         {yearData.year}
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900 text-right">
+                      <td className="hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-gray-900 text-right">
                         {yearData.participants.toLocaleString('fr-FR')}
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900 text-right font-semibold">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
                         <div className="flex items-center justify-end gap-1 sm:gap-2">
                           <span className="truncate">{yearData.revenue.toLocaleString('fr-FR', {
                             style: 'currency',
@@ -97,16 +110,16 @@ export default function YearlyComparison({ allCoursesData, triatlonData }: Yearl
                             maximumFractionDigits: 0
                           })}</span>
                           {caEvolution !== null && (
-                            <span className={`text-xs flex-shrink-0 ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {caEvolution >= 0 ? <TrendingUp className="w-3 h-3 inline" /> : <TrendingDown className="w-3 h-3 inline" />}
+                            <span className={`text-[8px] sm:text-xs flex-shrink-0 ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {caEvolution >= 0 ? <TrendingUp className="w-2 h-2 sm:w-3 sm:h-3 inline" /> : <TrendingDown className="w-2 h-2 sm:w-3 sm:h-3 inline" />}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900 text-right">
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-gray-900 text-right">
                         {yearData.buyers.toLocaleString('fr-FR')}
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 text-right">
+                      <td className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-gray-600 text-right">
                         {Math.round(yearData.revenuePerParticipant).toLocaleString('fr-FR', {
                           style: 'currency',
                           currency: 'EUR',
@@ -114,12 +127,12 @@ export default function YearlyComparison({ allCoursesData, triatlonData }: Yearl
                           maximumFractionDigits: 0
                         })}
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right">
-                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium bg-blue-100 text-blue-800">
+                      <td className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-right">
+                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded text-[8px] sm:text-xs font-medium bg-blue-100 text-blue-800">
                           {yearData.buyerPercentage.toFixed(1)}%
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 text-right">
+                      <td className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-gray-600 text-right">
                         {Math.round(yearData.avgOrder).toLocaleString('fr-FR', {
                           style: 'currency',
                           currency: 'EUR',
@@ -132,11 +145,11 @@ export default function YearlyComparison({ allCoursesData, triatlonData }: Yearl
                 })}
                 {/* Ligne Total */}
                 <tr className={`${bgColor} text-white font-bold`}>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">Total</td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm">Total</td>
+                  <td className="hidden sm:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-right">
                     {totals.participants.toLocaleString('fr-FR')}
                   </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-right">
                     {totals.revenue.toLocaleString('fr-FR', {
                       style: 'currency',
                       currency: 'EUR',
@@ -144,10 +157,10 @@ export default function YearlyComparison({ allCoursesData, triatlonData }: Yearl
                       maximumFractionDigits: 0
                     })}
                   </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-right">
                     {totals.buyers.toLocaleString('fr-FR')}
                   </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right">
+                  <td className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-right">
                     {Math.round(totals.revenuePerParticipant).toLocaleString('fr-FR', {
                       style: 'currency',
                       currency: 'EUR',
@@ -155,10 +168,10 @@ export default function YearlyComparison({ allCoursesData, triatlonData }: Yearl
                       maximumFractionDigits: 0
                     })}
                   </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right">
+                  <td className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-right">
                     {totals.buyerPercentage.toFixed(1)}%
                   </td>
-                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right">
+                  <td className="hidden lg:table-cell px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-sm text-right">
                     {Math.round(totals.avgOrder).toLocaleString('fr-FR', {
                       style: 'currency',
                       currency: 'EUR',

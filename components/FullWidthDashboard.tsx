@@ -519,187 +519,189 @@ export default function FullWidthDashboard() {
       {/* Main Content */}
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* KPI Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
           {/* CA Total */}
           <Card className="border-none shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-white to-red-50">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">CA Total</CardTitle>
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <Euro className="w-5 h-5 text-red-600" />
+                <CardTitle className="text-[10px] sm:text-sm font-medium text-gray-600">CA Total</CardTitle>
+                <div className="p-1 sm:p-2 bg-red-100 rounded-lg">
+                  <Euro className="w-3 h-3 sm:w-5 sm:h-5 text-red-600" />
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <CardContent className="p-3 sm:p-6">
+              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
                 {stats.totalCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
               </div>
-              <p className="text-xs text-gray-500 mt-2">{stats.totalOrders.toLocaleString('fr-FR')} commandes</p>
+              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">{stats.totalOrders.toLocaleString('fr-FR')} cmd</p>
             </CardContent>
           </Card>
 
           {/* Acheteurs */}
           <Card className="border-none shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-white to-green-50">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">Acheteurs</CardTitle>
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Users className="w-5 h-5 text-green-600" />
+                <CardTitle className="text-[10px] sm:text-sm font-medium text-gray-600">Acheteurs</CardTitle>
+                <div className="p-1 sm:p-2 bg-green-100 rounded-lg">
+                  <Users className="w-3 h-3 sm:w-5 sm:h-5 text-green-600" />
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <CardContent className="p-3 sm:p-6">
+              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
                 {stats.totalBuyers.toLocaleString('fr-FR')}
               </div>
-              <p className="text-xs text-gray-500 mt-2">Clients uniques</p>
+              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">Clients uniques</p>
             </CardContent>
           </Card>
 
           {/* Panier Moyen */}
           <Card className="border-none shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-white to-blue-50">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">Panier Moyen</CardTitle>
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <ShoppingCart className="w-5 h-5 text-blue-600" />
+                <CardTitle className="text-[10px] sm:text-sm font-medium text-gray-600">Panier Moy.</CardTitle>
+                <div className="p-1 sm:p-2 bg-blue-100 rounded-lg">
+                  <ShoppingCart className="w-3 h-3 sm:w-5 sm:h-5 text-blue-600" />
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <CardContent className="p-3 sm:p-6">
+              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
                 {stats.panierMoyen.toFixed(0)} €
               </div>
-              <p className="text-xs text-gray-500 mt-2">Par commande</p>
+              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">Par commande</p>
             </CardContent>
           </Card>
 
           {/* Événements */}
           <Card className="border-none shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-white to-purple-50">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">Événements</CardTitle>
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Calendar className="w-5 h-5 text-purple-600" />
+                <CardTitle className="text-[10px] sm:text-sm font-medium text-gray-600">Événements</CardTitle>
+                <div className="p-1 sm:p-2 bg-purple-100 rounded-lg">
+                  <Calendar className="w-3 h-3 sm:w-5 sm:h-5 text-purple-600" />
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <CardContent className="p-3 sm:p-6">
+              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
                 {stats.nombreEvenements}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                CA moyen: {(stats.totalCA / stats.nombreEvenements).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} €
+              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">
+                CA moy: {(stats.totalCA / stats.nombreEvenements).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} €
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Évolution du CA accumulé */}
-        <div className="grid grid-cols-1 mb-6 sm:mb-8">
-          <Card className="border-none shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <CardTitle className="text-base sm:text-lg font-bold text-gray-900">Évolution du CA Accumulé</CardTitle>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">Progression du chiffre d'affaires dans le temps</p>
-                </div>
-                <div className="text-left sm:text-right">
-                  <div className="text-xl sm:text-2xl font-bold text-green-600">
-                    {stats.totalCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+        {/* Évolution du CA accumulé - Hidden on mobile */}
+        {!isMobile && (
+          <div className="grid grid-cols-1 mb-6 sm:mb-8">
+            <Card className="border-none shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-base sm:text-lg font-bold text-gray-900">Évolution du CA Accumulé</CardTitle>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">Progression du chiffre d'affaires dans le temps</p>
                   </div>
-                  <div className="text-xs text-gray-500">Total actuel</div>
+                  <div className="text-left sm:text-right">
+                    <div className="text-xl sm:text-2xl font-bold text-green-600">
+                      {stats.totalCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                    </div>
+                    <div className="text-xs text-gray-500">Total actuel</div>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6 px-2 sm:px-6">
-              <div className="overflow-x-auto -mx-2 sm:mx-0">
-                <div className="min-w-[500px] sm:min-w-0">
-                  <ResponsiveContainer width="100%" height={300} className="sm:!h-[350px] lg:!h-[400px]">
-                    <AreaChart
-                      data={cumulativeData}
-                      margin={{
-                        top: 10,
-                        right: isMobile ? 10 : 60,
-                        left: isMobile ? 10 : 0,
-                        bottom: isMobile ? 20 : 0
-                      }}
-                    >
-                      <defs>
-                        <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
-                        </linearGradient>
-                        <linearGradient id="colorYearly" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis
-                        dataKey="date"
-                        tick={{ fontSize: isMobile ? 10 : 12 }}
-                        height={isMobile ? 60 : 40}
-                        interval={isMobile ? 'preserveStartEnd' : 0}
-                        angle={isMobile ? -45 : 0}
-                        textAnchor={isMobile ? 'end' : 'middle'}
-                      />
-                      <YAxis
-                        yAxisId="left"
-                        tick={{ fontSize: isMobile ? 9 : 12 }}
-                        tickFormatter={(value) => isMobile ? `${(value / 1000).toFixed(0)}k` : `${(value / 1000).toFixed(0)}k €`}
-                        domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.05)]}
-                        width={isMobile ? 35 : 60}
-                      />
-                      <YAxis
-                        yAxisId="right"
-                        orientation="right"
-                        tick={{ fontSize: isMobile ? 9 : 12 }}
-                        tickFormatter={(value) => isMobile ? `${(value / 1000).toFixed(0)}k` : `${(value / 1000).toFixed(0)}k €`}
-                        domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]}
-                        width={isMobile ? 35 : 60}
-                      />
-                      <Tooltip
-                        formatter={(value: any, name?: string | number) => {
-                          const formattedValue = `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`;
-                          const label = name === 'cumulative' ? 'CA Accumulé' : name === 'yearly' ? 'CA Annuel' : '';
-                          return [formattedValue, label];
+              </CardHeader>
+              <CardContent className="pt-6 px-2 sm:px-6">
+                <div className="overflow-x-auto -mx-2 sm:mx-0">
+                  <div className="min-w-[500px] sm:min-w-0">
+                    <ResponsiveContainer width="100%" height={300} className="sm:!h-[350px] lg:!h-[400px]">
+                      <AreaChart
+                        data={cumulativeData}
+                        margin={{
+                          top: 10,
+                          right: 60,
+                          left: 0,
+                          bottom: 0
                         }}
-                        contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                      />
-                      <Legend
-                        verticalAlign="top"
-                        height={36}
-                        formatter={(value) => value === 'cumulative' ? 'CA Accumulé' : 'CA Annuel'}
-                        wrapperStyle={{ fontSize: isMobile ? '10px' : '12px' }}
-                      />
-                      <Area
-                        yAxisId="left"
-                        type="linear"
-                        dataKey="cumulative"
-                        stroke="#10B981"
-                        strokeWidth={3}
-                        fillOpacity={1}
-                        fill="url(#colorCumulative)"
-                        name="cumulative"
-                      />
-                      <Area
-                        yAxisId="right"
-                        type="linear"
-                        dataKey="yearly"
-                        stroke="#3B82F6"
-                        strokeWidth={3}
-                        fillOpacity={0.3}
-                        fill="url(#colorYearly)"
-                        name="yearly"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                      >
+                        <defs>
+                          <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
+                          </linearGradient>
+                          <linearGradient id="colorYearly" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis
+                          dataKey="date"
+                          tick={{ fontSize: 12 }}
+                          height={40}
+                          interval={0}
+                          angle={0}
+                          textAnchor="middle"
+                        />
+                        <YAxis
+                          yAxisId="left"
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
+                          domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.05)]}
+                          width={60}
+                        />
+                        <YAxis
+                          yAxisId="right"
+                          orientation="right"
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
+                          domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]}
+                          width={60}
+                        />
+                        <Tooltip
+                          formatter={(value: any, name?: string | number) => {
+                            const formattedValue = `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`;
+                            const label = name === 'cumulative' ? 'CA Accumulé' : name === 'yearly' ? 'CA Annuel' : '';
+                            return [formattedValue, label];
+                          }}
+                          contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                        />
+                        <Legend
+                          verticalAlign="top"
+                          height={36}
+                          formatter={(value) => value === 'cumulative' ? 'CA Accumulé' : 'CA Annuel'}
+                          wrapperStyle={{ fontSize: '12px' }}
+                        />
+                        <Area
+                          yAxisId="left"
+                          type="linear"
+                          dataKey="cumulative"
+                          stroke="#10B981"
+                          strokeWidth={3}
+                          fillOpacity={1}
+                          fill="url(#colorCumulative)"
+                          name="cumulative"
+                        />
+                        <Area
+                          yAxisId="right"
+                          type="linear"
+                          dataKey="yearly"
+                          stroke="#3B82F6"
+                          strokeWidth={3}
+                          fillOpacity={0.3}
+                          fill="url(#colorYearly)"
+                          name="yearly"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Comparaison Annuelle */}
         <YearlyComparison
@@ -783,25 +785,25 @@ export default function FullWidthDashboard() {
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px]">
+              <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-left text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Événement
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      CA (€)
+                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      CA
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Acheteurs
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Panier moy.
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Participants
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       € / coureur
                     </th>
                   </tr>
@@ -809,26 +811,26 @@ export default function FullWidthDashboard() {
                 <tbody className="bg-white divide-y divide-gray-100">
                   {/* Ligne totale */}
                   <tr className="bg-gradient-to-r from-red-50 to-rose-50 font-bold border-b-2 border-red-200">
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
-                      TOTAL {selectedYear ? `(Année ${selectedYear})` : showTriathlonsOnly ? '(Triathlons)' : groupByYear ? '(Par année)' : ''}
+                    <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900">
+                      TOTAL {selectedYear ? `(${selectedYear})` : showTriathlonsOnly ? '(Tri.)' : groupByYear ? '(An.)' : ''}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
+                    <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.ca, 0).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
+                    <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.buyers, 0).toLocaleString('fr-FR')}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
+                    <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
                       {(() => {
                         const totalCA = filteredEvents.reduce((sum, e) => sum + e.ca, 0);
                         const totalBuyers = filteredEvents.reduce((sum, e) => sum + e.buyers, 0);
                         return totalBuyers > 0 ? `${(totalCA / totalBuyers).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-';
                       })()}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
+                    <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.participants, 0).toLocaleString('fr-FR')}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
+                    <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
                       {(() => {
                         const totalCA = filteredEvents.reduce((sum, e) => sum + e.ca, 0);
                         const totalParticipants = filteredEvents.reduce((sum, e) => sum + e.participants, 0);
@@ -851,25 +853,25 @@ export default function FullWidthDashboard() {
                           }
                         }}
                       >
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-900">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <div className={`w-2 h-2 rounded-full flex-shrink-0`} style={{ backgroundColor: getEventColor(event.name) }} />
+                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm font-medium text-gray-900">
+                          <div className="flex items-center gap-1 sm:gap-3">
+                            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0`} style={{ backgroundColor: getEventColor(event.name) }} />
                             <span className="truncate">{event.name}</span>
                           </div>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right font-semibold">
+                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
                           {event.ca.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {event.buyers.toLocaleString('fr-FR')}
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {event.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {event.participants > 0 ? event.participants.toLocaleString('fr-FR') : '-'}
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {event.revenuePerParticipant > 0 ? `${event.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
                         </td>
                       </tr>

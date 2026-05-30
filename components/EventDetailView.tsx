@@ -26,9 +26,19 @@ interface YearlyData {
 export default function EventDetailView({ eventName, onClose }: EventDetailViewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [yearlyData, setYearlyData] = useState<YearlyData[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     loadHistoricalData();
+
+    // Mobile detection
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, [eventName]);
 
   const loadHistoricalData = async () => {
@@ -229,78 +239,80 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
             </div>
           ) : (
             <div className="space-y-4 sm:space-y-6">
-              {/* Graphiques */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {/* Évolution du CA */}
-                <Card className="border shadow-sm">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm sm:text-base font-semibold">Évolution du CA</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={200} className="sm:!h-[250px]">
-                      <LineChart data={[...yearlyData].reverse()}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="year" tick={{ fontSize: 10 }} className="sm:text-xs" />
-                        <YAxis tick={{ fontSize: 10 }} className="sm:text-xs" />
-                        <Tooltip
-                          formatter={(value: any) => `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`}
-                          contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
-                        />
-                        <Line type="monotone" dataKey="revenue" stroke="#DC2626" strokeWidth={2} dot={{ r: 4, fill: '#DC2626' }} className="sm:!stroke-[3]" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+              {/* Graphiques - Hidden on mobile */}
+              {!isMobile && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  {/* Évolution du CA */}
+                  <Card className="border shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm sm:text-base font-semibold">Évolution du CA</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <LineChart data={[...yearlyData].reverse()}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                          <YAxis tick={{ fontSize: 10 }} />
+                          <Tooltip
+                            formatter={(value: any) => `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`}
+                            contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
+                          />
+                          <Line type="monotone" dataKey="revenue" stroke="#DC2626" strokeWidth={2} dot={{ r: 4, fill: '#DC2626' }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
 
-                {/* Évolution des acheteurs */}
-                <Card className="border shadow-sm">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm sm:text-base font-semibold">Évolution des acheteurs</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={200} className="sm:!h-[250px]">
-                      <BarChart data={[...yearlyData].reverse()}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="year" tick={{ fontSize: 10 }} className="sm:text-xs" />
-                        <YAxis tick={{ fontSize: 10 }} className="sm:text-xs" />
-                        <Tooltip
-                          formatter={(value: any) => Number(value).toLocaleString('fr-FR')}
-                          contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
-                        />
-                        <Bar dataKey="buyers" fill="#10B981" radius={[8, 8, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-              </div>
+                  {/* Évolution des acheteurs */}
+                  <Card className="border shadow-sm">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm sm:text-base font-semibold">Évolution des acheteurs</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <BarChart data={[...yearlyData].reverse()}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                          <YAxis tick={{ fontSize: 10 }} />
+                          <Tooltip
+                            formatter={(value: any) => Number(value).toLocaleString('fr-FR')}
+                            contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
+                          />
+                          <Bar dataKey="buyers" fill="#10B981" radius={[8, 8, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
 
               {/* Tableau détaillé */}
               <div className="overflow-x-auto -mx-4 sm:mx-0">
-                <table className="w-full min-w-[768px]">
+                <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-left text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Année
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      CA (€)
+                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      CA
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Évol. CA
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Participants
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Acheteurs
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       % Ach.
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Panier moy.
                     </th>
-                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-right text-[10px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       € / coureur
                     </th>
                   </tr>
@@ -312,41 +324,41 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
 
                     return (
                       <tr key={data.year} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-semibold text-gray-900">
+                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm font-semibold text-gray-900">
                           {data.year}
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right font-semibold">
+                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
                           {data.revenue.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-right">
+                        <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-right">
                           {caEvolution !== null ? (
                             <span className={`inline-flex items-center gap-0.5 sm:gap-1 ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {caEvolution >= 0 ? (
-                                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <TrendingUp className="w-2 h-2 sm:w-4 sm:h-4" />
                               ) : (
-                                <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <TrendingDown className="w-2 h-2 sm:w-4 sm:h-4" />
                               )}
-                              <span className="text-[10px] sm:text-xs">{caEvolution >= 0 ? '+' : ''}{caEvolution.toFixed(1)}%</span>
+                              <span className="text-[8px] sm:text-xs">{caEvolution >= 0 ? '+' : ''}{caEvolution.toFixed(1)}%</span>
                             </span>
                           ) : (
                             <span className="text-gray-400">-</span>
                           )}
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {data.participants.toLocaleString('fr-FR')}
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {data.buyers.toLocaleString('fr-FR')}
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-right">
-                          <span className="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-blue-100 text-blue-800">
+                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-right">
+                          <span className="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-xs font-medium bg-blue-100 text-blue-800">
                             {data.buyerPercentage.toFixed(1)}%
                           </span>
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {data.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
                         </td>
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
                           {data.revenuePerParticipant > 0 ? `${data.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
                         </td>
                       </tr>

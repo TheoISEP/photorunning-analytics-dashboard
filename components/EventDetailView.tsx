@@ -54,10 +54,19 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
 
       // Ajouter les données historiques (Past)
       pastData.forEach(event => {
-        const eventBaseName = event.event.replace(/\s*20\d{2}\s*$/, '').trim();
-        const normalizedEventName = normalizeEventName(eventBaseName, aliasMap);
+        // Normaliser le nom complet de l'événement (avec l'année)
+        const normalizedFullEventName = normalizeEventName(event.event, aliasMap);
 
-        if (normalizedEventName.toLowerCase() === normalizedBaseName.toLowerCase()) {
+        // Vérifier si le nom normalisé commence par le nom recherché (avec ou sans année)
+        const eventNameWithoutYear = normalizedFullEventName.replace(/\s*20\d{2}\s*$/, '').trim();
+        const searchNameWithoutYear = normalizedBaseName.replace(/\s*20\d{2}\s*$/, '').trim();
+
+        // Match si le nom de base correspond OU si le nom complet commence par le nom recherché
+        const isMatch =
+          eventNameWithoutYear.toLowerCase().startsWith(searchNameWithoutYear.toLowerCase()) ||
+          normalizedFullEventName.toLowerCase().startsWith(normalizedBaseName.toLowerCase());
+
+        if (isMatch) {
           // Extraire l'année du nom de l'événement en priorité
           const yearMatch = event.event.match(/20\d{2}/);
           let year = yearMatch ? yearMatch[0] : null;
@@ -99,10 +108,19 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
 
       // Ajouter les données actuelles (Now)
       nowData.forEach(event => {
-        const normalizedEventName = normalizeEventName(event.event, aliasMap);
-        const eventBaseName = normalizedEventName.replace(/\s*20\d{2}\s*$/, '').trim();
+        // Normaliser le nom complet de l'événement (avec l'année)
+        const normalizedFullEventName = normalizeEventName(event.event, aliasMap);
 
-        if (eventBaseName.toLowerCase() === normalizedBaseName.toLowerCase()) {
+        // Vérifier si le nom normalisé commence par le nom recherché (avec ou sans année)
+        const eventNameWithoutYear = normalizedFullEventName.replace(/\s*20\d{2}\s*$/, '').trim();
+        const searchNameWithoutYear = normalizedBaseName.replace(/\s*20\d{2}\s*$/, '').trim();
+
+        // Match si le nom de base correspond OU si le nom complet commence par le nom recherché
+        const isMatch =
+          eventNameWithoutYear.toLowerCase().startsWith(searchNameWithoutYear.toLowerCase()) ||
+          normalizedFullEventName.toLowerCase().startsWith(normalizedBaseName.toLowerCase());
+
+        if (isMatch) {
           // Extraire l'année du nom de l'événement en priorité
           const yearMatch = event.event.match(/20\d{2}/);
           let year = yearMatch ? yearMatch[0] : null;

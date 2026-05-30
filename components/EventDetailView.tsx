@@ -165,11 +165,26 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
       });
 
       // Convertir en tableau et calculer les statistiques
+      console.log('📊 Années trouvées dans yearlyMap:', Array.from(yearlyMap.keys()));
+
       const eventHistory = Array.from(yearlyMap.entries())
-        .filter(([year]) => year.match(/^20\d{2}$/)) // Garder seulement les années valides (format 20XX)
+        .filter(([year]) => {
+          const isValid = year.match(/^20\d{2}$/);
+          if (!isValid) {
+            console.warn('⚠️ Année invalide filtrée:', year);
+          }
+          return isValid;
+        }) // Garder seulement les années valides (format 20XX)
         .map(([year, data]) => {
           const buyers = data.buyers.size;
           const participants = data.participants || buyers; // Si pas de participants, utiliser buyers
+
+          console.log(`📅 Année ${year}:`, {
+            revenue: data.revenue,
+            buyers,
+            participants,
+            orders: data.orders
+          });
 
           return {
             year,
@@ -183,6 +198,7 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
         })
         .sort((a, b) => b.year.localeCompare(a.year)); // Trier par année décroissante
 
+      console.log('✅ Données finales à afficher:', eventHistory);
       setYearlyData(eventHistory);
     } catch (error) {
       console.error('Error loading historical data:', error);
@@ -197,8 +213,14 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm">
-      <Card className="w-full h-full sm:h-auto sm:max-w-5xl sm:max-h-[90vh] overflow-hidden bg-white sm:shadow-2xl sm:rounded-lg">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <Card
+        className="w-full h-full sm:h-auto sm:max-w-5xl sm:max-h-[90vh] overflow-hidden bg-white sm:shadow-2xl sm:rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <CardHeader className="border-b border-gray-200 sticky top-0 bg-white z-10 px-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div>

@@ -219,7 +219,7 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
                         <XAxis dataKey="year" tick={{ fontSize: 10 }} className="sm:text-xs" />
                         <YAxis tick={{ fontSize: 10 }} className="sm:text-xs" />
                         <Tooltip
-                          formatter={(value: number) => `${value.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`}
+                          formatter={(value: any) => `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`}
                           contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
                         />
                         <Line type="monotone" dataKey="revenue" stroke="#DC2626" strokeWidth={2} dot={{ r: 4, fill: '#DC2626' }} className="sm:!stroke-[3]" />
@@ -240,7 +240,7 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
                         <XAxis dataKey="year" tick={{ fontSize: 10 }} className="sm:text-xs" />
                         <YAxis tick={{ fontSize: 10 }} className="sm:text-xs" />
                         <Tooltip
-                          formatter={(value: number) => value.toLocaleString('fr-FR')}
+                          formatter={(value: any) => Number(value).toLocaleString('fr-FR')}
                           contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px' }}
                         />
                         <Bar dataKey="buyers" fill="#10B981" radius={[8, 8, 0, 0]} />

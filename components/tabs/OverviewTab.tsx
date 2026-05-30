@@ -89,7 +89,7 @@ export default function OverviewTab({ events }: OverviewTabProps) {
             <XAxis dataKey="year" />
             <YAxis />
             <Tooltip
-              formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`}
+              formatter={(value: any) => `${Number(value).toLocaleString('fr-FR')} €`}
             />
             <Legend />
             <Line
@@ -119,7 +119,7 @@ export default function OverviewTab({ events }: OverviewTabProps) {
             />
             <YAxis />
             <Tooltip
-              formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`}
+              formatter={(value: any) => `${Number(value).toLocaleString('fr-FR')} €`}
             />
             <Bar dataKey="revenue" name="CA" fill="#3b82f6" />
           </BarChart>

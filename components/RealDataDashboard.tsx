@@ -299,7 +299,7 @@ export default function RealDataDashboard() {
                   />
                   <YAxis />
                   <Tooltip
-                    formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`}
+                    formatter={(value: any) => `${Number(value).toLocaleString('fr-FR')} €`}
                     contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px' }}
                   />
                   <Bar dataKey="ca" fill="#DC2626" radius={[8, 8, 0, 0]} />
@@ -326,7 +326,7 @@ export default function RealDataDashboard() {
                   />
                   <YAxis />
                   <Tooltip
-                    formatter={(value: number) => value.toLocaleString('fr-FR')}
+                    formatter={(value: any) => Number(value).toLocaleString('fr-FR')}
                     contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px' }}
                   />
                   <Line type="monotone" dataKey="buyers" stroke="#10B981" strokeWidth={3} dot={{ r: 5 }} />

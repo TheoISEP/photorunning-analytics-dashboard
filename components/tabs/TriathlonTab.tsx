@@ -126,11 +126,12 @@ export default function TriathlonTab({ events }: TriathlonTabProps) {
             <YAxis yAxisId="left" />
             <YAxis yAxisId="right" orientation="right" />
             <Tooltip
-              formatter={(value: number, name: string) => {
-                if (name === 'revenue') return [`${value.toLocaleString('fr-FR')} €`, 'CA'];
-                if (name === 'buyers') return [value.toLocaleString('fr-FR'), 'Acheteurs'];
-                if (name === 'events') return [value, 'Événements'];
-                return [value, name];
+              formatter={(value: any, name?: any) => {
+                const numValue = Number(value);
+                if (name === 'revenue') return [`${numValue.toLocaleString('fr-FR')} €`, 'CA'];
+                if (name === 'buyers') return [numValue.toLocaleString('fr-FR'), 'Acheteurs'];
+                if (name === 'events') return [numValue, 'Événements'];
+                return [numValue, name];
               }}
             />
             <Legend />
@@ -179,7 +180,7 @@ export default function TriathlonTab({ events }: TriathlonTabProps) {
               tick={{ fontSize: 12 }}
             />
             <Tooltip
-              formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`}
+              formatter={(value: any) => `${Number(value).toLocaleString('fr-FR')} €`}
             />
             <Bar dataKey="revenue" name="CA" fill="#9333ea" />
           </BarChart>
@@ -268,7 +269,7 @@ export default function TriathlonTab({ events }: TriathlonTabProps) {
                       <XAxis dataKey="year" />
                       <YAxis />
                       <Tooltip
-                        formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`}
+                        formatter={(value: any) => `${Number(value).toLocaleString('fr-FR')} €`}
                       />
                       <Bar dataKey="revenue" name="CA" fill="#9333ea" />
                     </BarChart>

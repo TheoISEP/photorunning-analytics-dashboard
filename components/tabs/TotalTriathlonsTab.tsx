@@ -75,7 +75,7 @@ export default function TotalTriathlonsTab({ events }: TotalTriathlonsTabProps) 
               <XAxis dataKey="year" />
               <YAxis />
               <Tooltip
-                formatter={(value: number) => `€${value.toLocaleString('fr-FR')}`}
+                formatter={(value: any) => `€${value.toLocaleString('fr-FR')}`}
               />
               <Line type="monotone" dataKey="revenue" name="CA" stroke="#eab308" strokeWidth={3} dot={{ r: 5 }} />
             </LineChart>
@@ -90,7 +90,7 @@ export default function TotalTriathlonsTab({ events }: TotalTriathlonsTabProps) 
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
               <YAxis />
-              <Tooltip formatter={(value: number) => value.toLocaleString('fr-FR')} />
+              <Tooltip formatter={(value: any) => Number(value).toLocaleString('fr-FR')} />
               <Bar dataKey="buyers" name="Acheteurs" fill="#eab308" />
             </BarChart>
           </ResponsiveContainer>

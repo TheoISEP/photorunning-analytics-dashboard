@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { clearAuthSession } from '@/lib/auth';
 import { fetchPastData, fetchNowData, fetchAliaseData, normalizeEventName } from '@/lib/googleSheets';
 import {
@@ -844,9 +844,8 @@ export default function FullWidthDashboard() {
                   {paginatedEvents.map((event, index) => {
                     const isExpanded = expandedEventIndex === index;
                     return (
-                      <>
+                      <Fragment key={index}>
                         <tr
-                          key={index}
                           className="hover:bg-gray-50 transition-colors cursor-pointer"
                           onClick={() => {
                             if (groupByYear && !selectedYear) {
@@ -920,7 +919,7 @@ export default function FullWidthDashboard() {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </Fragment>
                     );
                   })}
                 </tbody>

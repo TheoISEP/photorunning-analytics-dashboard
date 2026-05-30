@@ -7,6 +7,11 @@ const config: Config = {
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
   ],
+  safelist: [
+    'grid-cols-2',
+    'grid-cols-3',
+    'grid-cols-4',
+  ],
   theme: {
     container: {
       center: true,

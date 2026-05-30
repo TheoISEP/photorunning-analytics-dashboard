@@ -208,26 +208,26 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm"
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <Card
-        className="w-full h-full sm:h-auto sm:max-w-5xl sm:max-h-[90vh] overflow-hidden bg-white sm:shadow-2xl sm:rounded-lg"
+        className="w-full max-w-3xl max-h-[85vh] overflow-hidden bg-white shadow-2xl rounded-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <CardHeader className="border-b border-gray-200 sticky top-0 bg-white z-10 px-4 sm:px-6">
+        <CardHeader className="border-b border-gray-200 sticky top-0 bg-white z-10 px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg sm:text-2xl font-bold text-gray-900">{eventName}</CardTitle>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1">Comparatif année par année</p>
+              <CardTitle className="text-base sm:text-lg font-bold text-gray-900">{eventName}</CardTitle>
+              <p className="text-xs text-gray-600 mt-1">Comparatif année par année</p>
             </div>
             <Button variant="ghost" size="sm" onClick={onClose} className="flex-shrink-0">
-              <X className="w-4 h-4 sm:w-5 sm:h-5" />
+              <X className="w-4 h-4" />
             </Button>
           </div>
         </CardHeader>
 
-        <CardContent className="p-4 sm:p-6 overflow-y-auto h-[calc(100vh-80px)] sm:h-auto sm:max-h-[calc(90vh-120px)] bg-white">
+        <CardContent className="p-4 sm:p-6 overflow-y-auto max-h-[calc(85vh-80px)] bg-white">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin" />
@@ -291,29 +291,20 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
                 <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-left text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 text-left text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Année
                     </th>
-                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       CA
                     </th>
-                    <th className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Évol. CA
+                    <th className="hidden sm:table-cell px-2 sm:px-4 py-2 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      Évol.
                     </th>
-                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Participants
-                    </th>
-                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-2 sm:px-4 py-2 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Acheteurs
                     </th>
-                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      % Ach.
-                    </th>
-                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="hidden sm:table-cell px-2 sm:px-4 py-2 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Panier moy.
-                    </th>
-                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      € / coureur
                     </th>
                   </tr>
                 </thead>
@@ -324,19 +315,19 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
 
                     return (
                       <tr key={data.year} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm font-semibold text-gray-900">
+                        <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm font-semibold text-gray-900">
                           {data.year}
                         </td>
-                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
+                        <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
                           {data.revenue.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                         </td>
-                        <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-right">
+                        <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-right">
                           {caEvolution !== null ? (
-                            <span className={`inline-flex items-center gap-0.5 sm:gap-1 ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            <span className={`inline-flex items-center gap-0.5 ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {caEvolution >= 0 ? (
-                                <TrendingUp className="w-2 h-2 sm:w-4 sm:h-4" />
+                                <TrendingUp className="w-2 h-2 sm:w-3 sm:h-3" />
                               ) : (
-                                <TrendingDown className="w-2 h-2 sm:w-4 sm:h-4" />
+                                <TrendingDown className="w-2 h-2 sm:w-3 sm:h-3" />
                               )}
                               <span className="text-[8px] sm:text-xs">{caEvolution >= 0 ? '+' : ''}{caEvolution.toFixed(1)}%</span>
                             </span>
@@ -344,22 +335,11 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
                             <span className="text-gray-400">-</span>
                           )}
                         </td>
-                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {data.participants.toLocaleString('fr-FR')}
-                        </td>
-                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                        <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
                           {data.buyers.toLocaleString('fr-FR')}
                         </td>
-                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-right">
-                          <span className="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-xs font-medium bg-blue-100 text-blue-800">
-                            {data.buyerPercentage.toFixed(1)}%
-                          </span>
-                        </td>
-                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                        <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
                           {data.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
-                        </td>
-                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {data.revenuePerParticipant > 0 ? `${data.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
                         </td>
                       </tr>
                     );

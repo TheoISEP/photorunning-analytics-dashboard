@@ -13,7 +13,9 @@ import {
   Loader2,
   Search,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  Eye
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,6 +57,7 @@ export default function FullWidthDashboard() {
   }>({ allCourses: [], triathlons: [] });
   const [cumulativeData, setCumulativeData] = useState<Array<{ date: string; cumulative: number; yearly: number }>>([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [expandedEventIndex, setExpandedEventIndex] = useState<number | null>(null);
   const itemsPerPage = 20;
 
   useEffect(() => {
@@ -839,42 +842,85 @@ export default function FullWidthDashboard() {
                     </td>
                   </tr>
                   {paginatedEvents.map((event, index) => {
+                    const isExpanded = expandedEventIndex === index;
                     return (
-                      <tr
-                        key={index}
-                        className="hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => {
-                          if (groupByYear && !selectedYear) {
-                            // Clic sur une année en mode groupé : afficher le détail des courses
-                            setSelectedYear(event.name);
-                          } else {
-                            // Clic sur une course : afficher le détail de l'événement
-                            setSelectedEvent(event.name);
-                          }
-                        }}
-                      >
-                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm font-medium text-gray-900">
-                          <div className="flex items-center gap-1 sm:gap-3">
-                            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0`} style={{ backgroundColor: getEventColor(event.name) }} />
-                            <span className="truncate">{event.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
-                          {event.ca.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
-                        </td>
-                        <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {event.buyers.toLocaleString('fr-FR')}
-                        </td>
-                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {event.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
-                        </td>
-                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {event.participants > 0 ? event.participants.toLocaleString('fr-FR') : '-'}
-                        </td>
-                        <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {event.revenuePerParticipant > 0 ? `${event.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
-                        </td>
-                      </tr>
+                      <>
+                        <tr
+                          key={index}
+                          className="hover:bg-gray-50 transition-colors cursor-pointer"
+                          onClick={() => {
+                            if (groupByYear && !selectedYear) {
+                              setSelectedYear(event.name);
+                            } else {
+                              setExpandedEventIndex(isExpanded ? null : index);
+                            }
+                          }}
+                        >
+                          <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm font-medium text-gray-900">
+                            <div className="flex items-center gap-1 sm:gap-3">
+                              <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                              <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0`} style={{ backgroundColor: getEventColor(event.name) }} />
+                              <span className="truncate">{event.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
+                            {event.ca.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                          </td>
+                          <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {event.buyers.toLocaleString('fr-FR')}
+                          </td>
+                          <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {event.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                          </td>
+                          <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {event.participants > 0 ? event.participants.toLocaleString('fr-FR') : '-'}
+                          </td>
+                          <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {event.revenuePerParticipant > 0 ? `${event.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
+                          </td>
+                        </tr>
+                        {/* Expanded row with details */}
+                        {isExpanded && (
+                          <tr className="bg-gray-50">
+                            <td colSpan={6} className="px-2 sm:px-6 py-3 sm:py-4">
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                                <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] sm:text-xs text-gray-500">Acheteurs</p>
+                                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{event.buyers.toLocaleString('fr-FR')}</p>
+                                </div>
+                                <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] sm:text-xs text-gray-500">Panier moyen</p>
+                                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{event.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</p>
+                                </div>
+                                <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] sm:text-xs text-gray-500">Participants</p>
+                                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{event.participants > 0 ? event.participants.toLocaleString('fr-FR') : '-'}</p>
+                                </div>
+                                <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] sm:text-xs text-gray-500">€ / coureur</p>
+                                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{event.revenuePerParticipant > 0 ? `${event.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}</p>
+                                </div>
+                              </div>
+                              {!groupByYear && (
+                                <div className="mt-3 flex justify-end">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedEvent(event.name);
+                                    }}
+                                    className="text-xs gap-1"
+                                  >
+                                    <Eye className="w-3 h-3" />
+                                    Voir l'historique
+                                  </Button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     );
                   })}
                 </tbody>

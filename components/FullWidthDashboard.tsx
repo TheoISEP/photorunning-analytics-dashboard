@@ -54,10 +54,21 @@ export default function FullWidthDashboard() {
     triathlons: any[];
   }>({ allCourses: [], triathlons: [] });
   const [cumulativeData, setCumulativeData] = useState<Array<{ date: string; cumulative: number; yearly: number }>>([]);
+  const [isMobile, setIsMobile] = useState(false);
   const itemsPerPage = 20;
 
   useEffect(() => {
     loadData();
+
+    // Détecter si on est sur mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const loadData = async () => {
@@ -599,77 +610,91 @@ export default function FullWidthDashboard() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="pt-6">
-              <ResponsiveContainer width="100%" height={300} className="sm:!h-[350px] lg:!h-[400px]">
-                <AreaChart data={cumulativeData} margin={{ top: 20, right: 60, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
-                    </linearGradient>
-                    <linearGradient id="colorYearly" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis
-                    dataKey="date"
-                    tick={{ fontSize: 12 }}
-                    height={40}
-                    interval={0}
-                  />
-                  <YAxis
-                    yAxisId="left"
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
-                    domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.05)]}
-                    label={{ value: 'CA Accumulé', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: '#10B981' } }}
-                  />
-                  <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => `${(value / 1000).toFixed(0)}k €`}
-                    domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]}
-                    label={{ value: 'CA Annuel', angle: 90, position: 'insideRight', style: { fontSize: 12, fill: '#3B82F6' } }}
-                  />
-                  <Tooltip
-                    formatter={(value: any, name: string) => {
-                      const formattedValue = `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`;
-                      const label = name === 'cumulative' ? 'CA Accumulé' : 'CA Annuel';
-                      return [formattedValue, label];
-                    }}
-                    contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                  />
-                  <Legend
-                    verticalAlign="top"
-                    height={36}
-                    formatter={(value) => value === 'cumulative' ? 'CA Accumulé' : 'CA Annuel'}
-                    wrapperStyle={{ fontSize: '12px' }}
-                  />
-                  <Area
-                    yAxisId="left"
-                    type="linear"
-                    dataKey="cumulative"
-                    stroke="#10B981"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorCumulative)"
-                    name="cumulative"
-                  />
-                  <Area
-                    yAxisId="right"
-                    type="linear"
-                    dataKey="yearly"
-                    stroke="#3B82F6"
-                    strokeWidth={3}
-                    fillOpacity={0.3}
-                    fill="url(#colorYearly)"
-                    name="yearly"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            <CardContent className="pt-6 px-2 sm:px-6">
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
+                <div className="min-w-[500px] sm:min-w-0">
+                  <ResponsiveContainer width="100%" height={300} className="sm:!h-[350px] lg:!h-[400px]">
+                    <AreaChart
+                      data={cumulativeData}
+                      margin={{
+                        top: 10,
+                        right: isMobile ? 10 : 60,
+                        left: isMobile ? 10 : 0,
+                        bottom: isMobile ? 20 : 0
+                      }}
+                    >
+                      <defs>
+                        <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
+                        </linearGradient>
+                        <linearGradient id="colorYearly" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: isMobile ? 10 : 12 }}
+                        height={isMobile ? 60 : 40}
+                        interval={isMobile ? 'preserveStartEnd' : 0}
+                        angle={isMobile ? -45 : 0}
+                        textAnchor={isMobile ? 'end' : 'middle'}
+                      />
+                      <YAxis
+                        yAxisId="left"
+                        tick={{ fontSize: isMobile ? 9 : 12 }}
+                        tickFormatter={(value) => isMobile ? `${(value / 1000).toFixed(0)}k` : `${(value / 1000).toFixed(0)}k €`}
+                        domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.05)]}
+                        width={isMobile ? 35 : 60}
+                      />
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        tick={{ fontSize: isMobile ? 9 : 12 }}
+                        tickFormatter={(value) => isMobile ? `${(value / 1000).toFixed(0)}k` : `${(value / 1000).toFixed(0)}k €`}
+                        domain={[0, (dataMax: number) => Math.ceil(dataMax * 1.1)]}
+                        width={isMobile ? 35 : 60}
+                      />
+                      <Tooltip
+                        formatter={(value: any, name?: string | number) => {
+                          const formattedValue = `${Number(value).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €`;
+                          const label = name === 'cumulative' ? 'CA Accumulé' : name === 'yearly' ? 'CA Annuel' : '';
+                          return [formattedValue, label];
+                        }}
+                        contentStyle={{ backgroundColor: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                      />
+                      <Legend
+                        verticalAlign="top"
+                        height={36}
+                        formatter={(value) => value === 'cumulative' ? 'CA Accumulé' : 'CA Annuel'}
+                        wrapperStyle={{ fontSize: isMobile ? '10px' : '12px' }}
+                      />
+                      <Area
+                        yAxisId="left"
+                        type="linear"
+                        dataKey="cumulative"
+                        stroke="#10B981"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorCumulative)"
+                        name="cumulative"
+                      />
+                      <Area
+                        yAxisId="right"
+                        type="linear"
+                        dataKey="yearly"
+                        stroke="#3B82F6"
+                        strokeWidth={3}
+                        fillOpacity={0.3}
+                        fill="url(#colorYearly)"
+                        name="yearly"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>

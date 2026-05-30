@@ -1,0 +1,79 @@
+{
+  "totalCA": 476109.7899999006,
+  "totalBuyers": 16983,
+  "panierMoyen": 28.03449272801629,
+  "totalRemboursements": 0,
+  "nombreEvenements": 29,
+  "topEvents": [
+    {
+      "name": "Brooks Marathon du lac d’Annecy 2026",
+      "ca": 58858.349999998994,
+      "buyers": 1895,
+      "orders": 2009
+    },
+    {
+      "name": "Abalone Marathon de Nantes 2026",
+      "ca": 56136.359999999135,
+      "buyers": 1729,
+      "orders": 1900
+    },
+    {
+      "name": "La Grande Course RATP du Grand Paris 2026",
+      "ca": 46750.25999999982,
+      "buyers": 1727,
+      "orders": 1832
+    },
+    {
+      "name": "Marathon de Biarritz 2026",
+      "ca": 45570.60999999988,
+      "buyers": 1608,
+      "orders": 1708
+    },
+    {
+      "name": "Nice Semi-Marathon 2026",
+      "ca": 44244.349999999926,
+      "buyers": 1487,
+      "orders": 1625
+    },
+    {
+      "name": "Marathon de Genève 2026",
+      "ca": 41230.49000000015,
+      "buyers": 987,
+      "orders": 1129
+    },
+    {
+      "name": "Montpellier Run Festival 2026",
+      "ca": 26446.28000000051,
+      "buyers": 971,
+      "orders": 1040
+    },
+    {
+      "name": "Radiance Mutuelle Lyon Urban Trail 2026",
+      "ca": 22282.96000000024,
+      "buyers": 869,
+      "orders": 926
+    },
+    {
+      "name": "Trail Des Forts de Besançon 2026",
+      "ca": 19322.090000000047,
+      "buyers": 1864,
+      "orders": 2163
+    },
+    {
+      "name": "Marathon du golfe de Saint Tropez 2026",
+      "ca": 19284.66000000007,
+      "buyers": 568,
+      "orders": 651
+    }
+  ],
+  "parAnnee": [
+    {
+      "year": 2026,
+      "ca": 476109.7899999006,
+      "buyers": 16983,
+      "orders": 18742,
+      "events": 29,
+      "panierMoyen": 28.03449272801629
+    }
+  ]
+}

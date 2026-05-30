@@ -106,9 +106,10 @@ export default function FullWidthDashboard() {
         const eventData = eventMap.get(normalizedName)!;
         eventData.ca += event.revenue; // Déjà converti dans googleSheets.ts
         eventData.participants += event.participants;
-        // Pour Past, on n'a pas les emails individuels, on crée des buyers fictifs
+        // Pour Past, on n'a pas les emails individuels, on crée des buyers fictifs uniques
+        const currentBuyerCount = eventData.buyers.size;
         for (let i = 0; i < event.buyers; i++) {
-          eventData.buyers.add(`${normalizedName}_buyer_${i}`);
+          eventData.buyers.add(`${normalizedName}_past_buyer_${currentBuyerCount + i}`);
         }
         eventData.orders += event.buyers; // Approximation: 1 buyer = 1 order
       });
@@ -130,9 +131,10 @@ export default function FullWidthDashboard() {
         eventData.ca += event.totalRevenue;
         eventData.orders += event.orders;
         eventData.participants += event.participants;
-        // Pour Now, on n'a pas les emails individuels, on crée des buyers fictifs basés sur le nombre de commandes
+        // Pour Now, on n'a pas les emails individuels, on crée des buyers fictifs uniques basés sur le nombre de commandes
+        const currentBuyerCount = eventData.buyers.size;
         for (let i = 0; i < event.orders; i++) {
-          eventData.buyers.add(`${normalizedName}_now_buyer_${i}`);
+          eventData.buyers.add(`${normalizedName}_now_buyer_${currentBuyerCount + i}`);
         }
       });
 

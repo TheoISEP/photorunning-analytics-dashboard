@@ -15,7 +15,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  Eye
+  Eye,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -58,6 +61,8 @@ export default function FullWidthDashboard() {
   const [cumulativeData, setCumulativeData] = useState<Array<{ date: string; cumulative: number; yearly: number }>>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [expandedEventIndex, setExpandedEventIndex] = useState<number | null>(null);
+  const [sortColumn, setSortColumn] = useState<'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant' | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const itemsPerPage = 20;
 
   useEffect(() => {
@@ -438,7 +443,32 @@ export default function FullWidthDashboard() {
     });
   }
 
-  const filteredEvents = displayEvents;
+  // Fonction de tri
+  const handleSort = (column: 'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant') => {
+    if (sortColumn === column) {
+      // Si on clique sur la même colonne, inverser la direction
+      setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
+    } else {
+      // Nouvelle colonne, commencer par décroissant
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  // Appliquer le tri
+  let filteredEvents = [...displayEvents];
+  if (sortColumn) {
+    filteredEvents.sort((a, b) => {
+      const aVal = a[sortColumn];
+      const bVal = b[sortColumn];
+
+      if (sortDirection === 'desc') {
+        return bVal - aVal;
+      } else {
+        return aVal - bVal;
+      }
+    });
+  }
 
   // Pagination
   const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
@@ -446,10 +476,22 @@ export default function FullWidthDashboard() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
 
-  // Reset page when search or filter changes
+  // Reset page when search, filter, or sort changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, showTriathlonsOnly, groupByYear, selectedYear]);
+  }, [searchQuery, showTriathlonsOnly, groupByYear, selectedYear ?? '', sortColumn ?? '', sortDirection]);
+
+  // Fonction helper pour afficher l'icône de tri
+  const renderSortIcon = (column: 'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant') => {
+    if (sortColumn !== column) {
+      return <ArrowUpDown className="w-3 h-3 ml-1 inline opacity-40" />;
+    }
+    return sortDirection === 'desc' ? (
+      <ArrowDown className="w-3 h-3 ml-1 inline text-red-600" />
+    ) : (
+      <ArrowUp className="w-3 h-3 ml-1 inline text-red-600" />
+    );
+  };
 
   if (isLoading) {
     return (
@@ -771,18 +813,6 @@ export default function FullWidthDashboard() {
                   ) : null}
                 </div>
 
-                {/* Légende des couleurs par année */}
-                {!groupByYear && (
-                  <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="text-gray-500 font-medium">Années :</span>
-                    {Object.entries(YEAR_COLORS).map(([year, color]) => (
-                      <div key={year} className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-                        <span className="text-gray-600">{year}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           </CardHeader>
@@ -794,46 +824,76 @@ export default function FullWidthDashboard() {
                     <th className="px-2 sm:px-6 py-2 sm:py-4 text-left text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Événement
                     </th>
-                    <th className="px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      CA
+                    <th
+                      className="px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('ca')}
+                    >
+                      <span className="flex items-center justify-end">
+                        CA
+                        {renderSortIcon('ca')}
+                      </span>
                     </th>
-                    <th className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Acheteurs
+                    <th
+                      className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('buyers')}
+                    >
+                      <span className="flex items-center justify-end">
+                        Acheteurs
+                        {renderSortIcon('buyers')}
+                      </span>
                     </th>
-                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Panier moy.
+                    <th
+                      className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('avgOrder')}
+                    >
+                      <span className="flex items-center justify-end">
+                        Panier moy.
+                        {renderSortIcon('avgOrder')}
+                      </span>
                     </th>
-                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Participants
+                    <th
+                      className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('participants')}
+                    >
+                      <span className="flex items-center justify-end">
+                        Participants
+                        {renderSortIcon('participants')}
+                      </span>
                     </th>
-                    <th className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      € / coureur
+                    <th
+                      className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('revenuePerParticipant')}
+                    >
+                      <span className="flex items-center justify-end">
+                        € / coureur
+                        {renderSortIcon('revenuePerParticipant')}
+                      </span>
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
                   {/* Ligne totale */}
                   <tr className="bg-gradient-to-r from-red-50 to-rose-50 font-bold border-b-2 border-red-200">
-                    <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900">
+                    <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
                       TOTAL {selectedYear ? `(${selectedYear})` : showTriathlonsOnly ? '(Tri.)' : groupByYear ? '(An.)' : ''}
                     </td>
-                    <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
+                    <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.ca, 0).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                     </td>
-                    <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
+                    <td className="hidden sm:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.buyers, 0).toLocaleString('fr-FR')}
                     </td>
-                    <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
+                    <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {(() => {
                         const totalCA = filteredEvents.reduce((sum, e) => sum + e.ca, 0);
                         const totalBuyers = filteredEvents.reduce((sum, e) => sum + e.buyers, 0);
                         return totalBuyers > 0 ? `${(totalCA / totalBuyers).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-';
                       })()}
                     </td>
-                    <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
+                    <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.participants, 0).toLocaleString('fr-FR')}
                     </td>
-                    <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right">
+                    <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {(() => {
                         const totalCA = filteredEvents.reduce((sum, e) => sum + e.ca, 0);
                         const totalParticipants = filteredEvents.reduce((sum, e) => sum + e.participants, 0);
@@ -850,36 +910,40 @@ export default function FullWidthDashboard() {
                           onClick={() => {
                             if (groupByYear && !selectedYear) {
                               setSelectedYear(event.name);
-                            } else {
+                            } else if (isMobile) {
+                              // Sur mobile : expand pour voir les détails
                               setExpandedEventIndex(isExpanded ? null : index);
+                            } else {
+                              // Sur desktop : ouvrir directement la popup
+                              setSelectedEvent(event.name);
                             }
                           }}
                         >
-                          <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm font-medium text-gray-900">
+                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-900">
                             <div className="flex items-center gap-1 sm:gap-3">
-                              <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                              {isMobile && <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
                               <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0`} style={{ backgroundColor: getEventColor(event.name) }} />
                               <span className="truncate">{event.name}</span>
                             </div>
                           </td>
-                          <td className="px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
+                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right font-semibold">
                             {event.ca.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                           </td>
-                          <td className="hidden sm:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                          <td className="hidden sm:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
                             {event.buyers.toLocaleString('fr-FR')}
                           </td>
-                          <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                          <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
                             {event.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
                           </td>
-                          <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                          <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
                             {event.participants > 0 ? event.participants.toLocaleString('fr-FR') : '-'}
                           </td>
-                          <td className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-sm text-gray-600 text-right">
+                          <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
                             {event.revenuePerParticipant > 0 ? `${event.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
                           </td>
                         </tr>
-                        {/* Expanded row with details */}
-                        {isExpanded && (
+                        {/* Expanded row with details - Mobile only */}
+                        {isMobile && isExpanded && (
                           <tr className="bg-gray-50">
                             <td colSpan={6} className="px-2 sm:px-6 py-3 sm:py-4">
                               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">

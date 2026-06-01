@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { X, TrendingUp, TrendingDown, Calendar } from 'lucide-react';
+import { useEffect, useState, Fragment } from 'react';
+import { X, TrendingUp, TrendingDown, Calendar, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { fetchPastData, fetchNowData, fetchAliaseData, normalizeEventName } from '@/lib/googleSheets';
@@ -27,6 +27,7 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
   const [isLoading, setIsLoading] = useState(true);
   const [yearlyData, setYearlyData] = useState<YearlyData[]>([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [expandedYearIndex, setExpandedYearIndex] = useState<number | null>(null);
 
   useEffect(() => {
     loadHistoricalData();
@@ -304,6 +305,12 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
                       Acheteurs
                     </th>
                     <th className="hidden sm:table-cell px-2 sm:px-4 py-2 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      % Acheteurs
+                    </th>
+                    <th className="hidden sm:table-cell px-2 sm:px-4 py-2 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      € / coureur
+                    </th>
+                    <th className="hidden sm:table-cell px-2 sm:px-4 py-2 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       Panier moy.
                     </th>
                   </tr>
@@ -312,36 +319,90 @@ export default function EventDetailView({ eventName, onClose }: EventDetailViewP
                   {yearlyData.map((data, index) => {
                     const previousYear = yearlyData[index + 1];
                     const caEvolution = previousYear ? calculateEvolution(data.revenue, previousYear.revenue) : null;
+                    const isExpanded = expandedYearIndex === index;
 
                     return (
-                      <tr key={data.year} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm font-semibold text-gray-900">
-                          {data.year}
-                        </td>
-                        <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
-                          {data.revenue.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
-                        </td>
-                        <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-right">
-                          {caEvolution !== null ? (
-                            <span className={`inline-flex items-center gap-0.5 ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {caEvolution >= 0 ? (
-                                <TrendingUp className="w-2 h-2 sm:w-3 sm:h-3" />
-                              ) : (
-                                <TrendingDown className="w-2 h-2 sm:w-3 sm:h-3" />
-                              )}
-                              <span className="text-[8px] sm:text-xs">{caEvolution >= 0 ? '+' : ''}{caEvolution.toFixed(1)}%</span>
-                            </span>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </td>
-                        <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {data.buyers.toLocaleString('fr-FR')}
-                        </td>
-                        <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
-                          {data.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
-                        </td>
-                      </tr>
+                      <Fragment key={data.year}>
+                        <tr
+                          className="hover:bg-gray-50 transition-colors cursor-pointer sm:cursor-default"
+                          onClick={() => {
+                            if (isMobile) {
+                              setExpandedYearIndex(isExpanded ? null : index);
+                            }
+                          }}
+                        >
+                          <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm font-semibold text-gray-900">
+                            <div className="flex items-center gap-1">
+                              {isMobile && <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
+                              <span>{data.year}</span>
+                            </div>
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-900 text-right font-semibold">
+                            {data.revenue.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                          </td>
+                          <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-right">
+                            {caEvolution !== null ? (
+                              <span className={`inline-flex items-center gap-0.5 ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {caEvolution >= 0 ? (
+                                  <TrendingUp className="w-2 h-2 sm:w-3 sm:h-3" />
+                                ) : (
+                                  <TrendingDown className="w-2 h-2 sm:w-3 sm:h-3" />
+                                )}
+                                <span className="text-[8px] sm:text-xs">{caEvolution >= 0 ? '+' : ''}{caEvolution.toFixed(1)}%</span>
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {data.buyers.toLocaleString('fr-FR')}
+                          </td>
+                          <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {data.buyerPercentage > 0 ? `${data.buyerPercentage.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %` : '-'}
+                          </td>
+                          <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {data.revenuePerParticipant > 0 ? `${data.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
+                          </td>
+                          <td className="hidden sm:table-cell px-2 sm:px-4 py-2 text-[9px] sm:text-sm text-gray-600 text-right">
+                            {data.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                          </td>
+                        </tr>
+                        {/* Expanded row with details - Mobile only */}
+                        {isMobile && isExpanded && (
+                          <tr className="bg-gray-50">
+                            <td colSpan={4} className="px-2 py-3">
+                              <div className="grid grid-cols-2 gap-2">
+                                {caEvolution !== null && (
+                                  <div className="bg-white p-2 rounded-lg border border-gray-200">
+                                    <p className="text-[8px] text-gray-500">Évolution CA</p>
+                                    <p className={`text-xs font-semibold ${caEvolution >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                      {caEvolution >= 0 ? '+' : ''}{caEvolution.toFixed(1)}%
+                                    </p>
+                                  </div>
+                                )}
+                                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] text-gray-500">% Acheteurs</p>
+                                  <p className="text-xs font-semibold text-gray-900">
+                                    {data.buyerPercentage > 0 ? `${data.buyerPercentage.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %` : '-'}
+                                  </p>
+                                </div>
+                                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] text-gray-500">€ / coureur</p>
+                                  <p className="text-xs font-semibold text-gray-900">
+                                    {data.revenuePerParticipant > 0 ? `${data.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
+                                  </p>
+                                </div>
+                                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] text-gray-500">Panier moyen</p>
+                                  <p className="text-xs font-semibold text-gray-900">
+                                    {data.avgOrder.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
                     );
                   })}
                 </tbody>

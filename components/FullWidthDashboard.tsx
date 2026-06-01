@@ -34,6 +34,7 @@ interface EventStats {
   avgOrder: number;
   participants: number;
   revenuePerParticipant: number;
+  buyerPercentage: number;
 }
 
 export default function FullWidthDashboard() {
@@ -41,10 +42,15 @@ export default function FullWidthDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({
     totalCA: 0,
+    currentYearCA: 0,
     totalBuyers: 0,
+    currentYearBuyers: 0,
     totalOrders: 0,
+    currentYearOrders: 0,
     nombreEvenements: 0,
+    currentYearEvents: 0,
     panierMoyen: 0,
+    currentYearPanierMoyen: 0,
     topEvents: [] as EventStats[],
     allEvents: [] as EventStats[]
   });
@@ -61,7 +67,7 @@ export default function FullWidthDashboard() {
   const [cumulativeData, setCumulativeData] = useState<Array<{ date: string; cumulative: number; yearly: number }>>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [expandedEventIndex, setExpandedEventIndex] = useState<number | null>(null);
-  const [sortColumn, setSortColumn] = useState<'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant' | null>(null);
+  const [sortColumn, setSortColumn] = useState<'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant' | 'buyerPercentage' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const itemsPerPage = 20;
 
@@ -164,7 +170,8 @@ export default function FullWidthDashboard() {
           orders: data.orders,
           avgOrder: data.buyers.size > 0 ? Math.round((data.ca / data.buyers.size) * 100) / 100 : 0,
           participants: data.participants,
-          revenuePerParticipant: data.participants > 0 ? Math.round((data.ca / data.participants) * 100) / 100 : 0
+          revenuePerParticipant: data.participants > 0 ? Math.round((data.ca / data.participants) * 100) / 100 : 0,
+          buyerPercentage: data.participants > 0 ? Math.round((data.buyers.size / data.participants) * 10000) / 100 : 0
         });
       });
 
@@ -242,12 +249,67 @@ export default function FullWidthDashboard() {
 
       setCumulativeData(cumulativeTimeline);
 
+      // Calculer les stats de l'année en cours
+      const currentYear = new Date().getFullYear().toString();
+      const currentYearCA = yearlyCA[currentYear] || 0;
+
+      // Filtrer les événements de l'année en cours
+      const currentYearBuyersSet = new Set<string>();
+      let currentYearOrders = 0;
+      let currentYearEventsCount = 0;
+
+      eventMap.forEach((data, eventName) => {
+        // Extraire l'année du nom de l'événement
+        const yearMatch = eventName.match(/20\d{2}/);
+        let year = yearMatch ? yearMatch[0] : null;
+
+        // Si pas d'année dans le nom, essayer depuis les données
+        if (!year) {
+          const pastEvent = pastData.find(e => normalizeEventName(e.event, aliasMap) === eventName);
+          if (pastEvent) {
+            const dateParts = pastEvent.date.split('/');
+            let yearStr = dateParts[2] || '';
+            if (yearStr.length === 2) {
+              const yearNum = parseInt(yearStr);
+              yearStr = yearNum >= 0 && yearNum <= 30 ? `20${yearStr}` : `19${yearStr}`;
+            }
+            year = yearStr;
+          } else {
+            const nowEvent = nowData.find(e => normalizeEventName(e.event, aliasMap) === eventName);
+            if (nowEvent) {
+              const dateParts = nowEvent.date.split('/');
+              let yearStr = dateParts[2] || '';
+              if (yearStr.length === 2) {
+                const yearNum = parseInt(yearStr);
+                yearStr = yearNum >= 0 && yearNum <= 30 ? `20${yearStr}` : `19${yearStr}`;
+              }
+              year = yearStr;
+            }
+          }
+        }
+
+        // Si c'est l'année en cours, ajouter aux stats
+        if (year === currentYear) {
+          currentYearEventsCount++;
+          currentYearOrders += data.orders;
+          data.buyers.forEach(buyer => currentYearBuyersSet.add(buyer));
+        }
+      });
+
+      const currentYearBuyers = currentYearBuyersSet.size;
+      const currentYearPanierMoyen = currentYearBuyers > 0 ? Math.round((currentYearCA / currentYearBuyers) * 100) / 100 : 0;
+
       setStats({
         totalCA: Math.round(totalCA * 100) / 100,
+        currentYearCA: Math.round(currentYearCA * 100) / 100,
         totalBuyers: allBuyers.size,
+        currentYearBuyers,
         totalOrders,
+        currentYearOrders,
         nombreEvenements: eventMap.size,
+        currentYearEvents: currentYearEventsCount,
         panierMoyen: allBuyers.size > 0 ? Math.round((totalCA / allBuyers.size) * 100) / 100 : 0,
+        currentYearPanierMoyen,
         topEvents: topEvents.slice(0, 15),
         allEvents: topEvents
       });
@@ -425,7 +487,8 @@ export default function FullWidthDashboard() {
       orders: data.orders,
       avgOrder: data.buyers > 0 ? data.ca / data.buyers : 0,
       participants: data.participants,
-      revenuePerParticipant: data.participants > 0 ? data.ca / data.participants : 0
+      revenuePerParticipant: data.participants > 0 ? data.ca / data.participants : 0,
+      buyerPercentage: data.participants > 0 ? Math.round((data.buyers / data.participants) * 10000) / 100 : 0
     })).sort((a, b) => b.name.localeCompare(a.name)); // Trier par année décroissante
   } else {
     // Affichage par course (mode normal)
@@ -444,7 +507,7 @@ export default function FullWidthDashboard() {
   }
 
   // Fonction de tri
-  const handleSort = (column: 'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant') => {
+  const handleSort = (column: 'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant' | 'buyerPercentage') => {
     if (sortColumn === column) {
       // Si on clique sur la même colonne, inverser la direction
       setSortDirection(sortDirection === 'desc' ? 'asc' : 'desc');
@@ -482,7 +545,7 @@ export default function FullWidthDashboard() {
   }, [searchQuery, showTriathlonsOnly, groupByYear, selectedYear ?? '', sortColumn ?? '', sortDirection]);
 
   // Fonction helper pour afficher l'icône de tri
-  const renderSortIcon = (column: 'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant') => {
+  const renderSortIcon = (column: 'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant' | 'buyerPercentage') => {
     if (sortColumn !== column) {
       return <ArrowUpDown className="w-3 h-3 ml-1 inline opacity-40" />;
     }
@@ -565,21 +628,33 @@ export default function FullWidthDashboard() {
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* KPI Cards Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-          {/* CA Total */}
+          {/* CA */}
           <Card className="border-none shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-white to-red-50">
             <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-[10px] sm:text-sm font-medium text-gray-600">CA Total</CardTitle>
+                <CardTitle className="text-[10px] sm:text-sm font-medium text-gray-600">CA</CardTitle>
                 <div className="p-1 sm:p-2 bg-red-100 rounded-lg">
                   <Euro className="w-3 h-3 sm:w-5 sm:h-5 text-red-600" />
                 </div>
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-6">
-              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
-                {stats.totalCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+              {/* Année en cours */}
+              <div className="mb-3 pb-3 border-b border-red-200">
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
+                  {stats.currentYearCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">{stats.currentYearOrders.toLocaleString('fr-FR')} cmd</p>
               </div>
-              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">{stats.totalOrders.toLocaleString('fr-FR')} cmd</p>
+              {/* Total */}
+              <div>
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
+                  {stats.totalCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">{stats.totalOrders.toLocaleString('fr-FR')} cmd</p>
+              </div>
             </CardContent>
           </Card>
 
@@ -594,10 +669,22 @@ export default function FullWidthDashboard() {
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-6">
-              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
-                {stats.totalBuyers.toLocaleString('fr-FR')}
+              {/* Année en cours */}
+              <div className="mb-3 pb-3 border-b border-green-200">
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
+                  {stats.currentYearBuyers.toLocaleString('fr-FR')}
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">Clients uniques</p>
               </div>
-              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">Clients uniques</p>
+              {/* Total */}
+              <div>
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
+                  {stats.totalBuyers.toLocaleString('fr-FR')}
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">Clients uniques</p>
+              </div>
             </CardContent>
           </Card>
 
@@ -612,10 +699,22 @@ export default function FullWidthDashboard() {
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-6">
-              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
-                {stats.panierMoyen.toFixed(0)} €
+              {/* Année en cours */}
+              <div className="mb-3 pb-3 border-b border-blue-200">
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
+                  {stats.currentYearPanierMoyen.toFixed(0)} €
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">Par commande</p>
               </div>
-              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">Par commande</p>
+              {/* Total */}
+              <div>
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
+                  {stats.panierMoyen.toFixed(0)} €
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">Par commande</p>
+              </div>
             </CardContent>
           </Card>
 
@@ -630,12 +729,26 @@ export default function FullWidthDashboard() {
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-6">
-              <div className="text-sm sm:text-2xl lg:text-4xl font-bold text-gray-900">
-                {stats.nombreEvenements}
+              {/* Année en cours */}
+              <div className="mb-3 pb-3 border-b border-purple-200">
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
+                  {stats.currentYearEvents}
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">
+                  CA moy: {stats.currentYearEvents > 0 ? (stats.currentYearCA / stats.currentYearEvents).toLocaleString('fr-FR', { minimumFractionDigits: 0 }) : 0} €
+                </p>
               </div>
-              <p className="text-[8px] sm:text-xs text-gray-500 mt-1 sm:mt-2">
-                CA moy: {(stats.totalCA / stats.nombreEvenements).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} €
-              </p>
+              {/* Total */}
+              <div>
+                <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
+                <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
+                  {stats.nombreEvenements}
+                </div>
+                <p className="text-[8px] sm:text-xs text-gray-500">
+                  CA moy: {(stats.totalCA / stats.nombreEvenements).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} €
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -817,8 +930,8 @@ export default function FullWidthDashboard() {
             </div>
           </CardHeader>
           <CardContent className="p-0 sm:p-6">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-2 sm:px-6 py-2 sm:py-4 text-left text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -862,6 +975,15 @@ export default function FullWidthDashboard() {
                     </th>
                     <th
                       className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                      onClick={() => handleSort('buyerPercentage')}
+                    >
+                      <span className="flex items-center justify-end">
+                        % Acheteurs
+                        {renderSortIcon('buyerPercentage')}
+                      </span>
+                    </th>
+                    <th
+                      className="hidden lg:table-cell px-2 sm:px-6 py-2 sm:py-4 text-right text-[9px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors select-none"
                       onClick={() => handleSort('revenuePerParticipant')}
                     >
                       <span className="flex items-center justify-end">
@@ -874,8 +996,8 @@ export default function FullWidthDashboard() {
                 <tbody className="bg-white divide-y divide-gray-100">
                   {/* Ligne totale */}
                   <tr className="bg-gradient-to-r from-red-50 to-rose-50 font-bold border-b-2 border-red-200">
-                    <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
-                      TOTAL {selectedYear ? `(${selectedYear})` : showTriathlonsOnly ? '(Tri.)' : groupByYear ? '(An.)' : ''}
+                    <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 max-w-[120px] sm:max-w-none">
+                      <span className="truncate block">TOTAL {selectedYear ? `(${selectedYear})` : showTriathlonsOnly ? '(Tri.)' : groupByYear ? '(An.)' : ''}</span>
                     </td>
                     <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.ca, 0).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
@@ -892,6 +1014,13 @@ export default function FullWidthDashboard() {
                     </td>
                     <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {filteredEvents.reduce((sum, e) => sum + e.participants, 0).toLocaleString('fr-FR')}
+                    </td>
+                    <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
+                      {(() => {
+                        const totalBuyers = filteredEvents.reduce((sum, e) => sum + e.buyers, 0);
+                        const totalParticipants = filteredEvents.reduce((sum, e) => sum + e.participants, 0);
+                        return totalParticipants > 0 ? `${((totalBuyers / totalParticipants) * 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %` : '-';
+                      })()}
                     </td>
                     <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right">
                       {(() => {
@@ -919,11 +1048,11 @@ export default function FullWidthDashboard() {
                             }
                           }}
                         >
-                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-900">
-                            <div className="flex items-center gap-1 sm:gap-3">
+                          <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-900 max-w-[120px] sm:max-w-none">
+                            <div className="flex items-center gap-1 sm:gap-3 min-w-0">
                               {isMobile && <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
                               <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0`} style={{ backgroundColor: getEventColor(event.name) }} />
-                              <span className="truncate">{event.name}</span>
+                              <span className="truncate min-w-0">{event.name}</span>
                             </div>
                           </td>
                           <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 text-right font-semibold">
@@ -939,6 +1068,9 @@ export default function FullWidthDashboard() {
                             {event.participants > 0 ? event.participants.toLocaleString('fr-FR') : '-'}
                           </td>
                           <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
+                            {event.buyerPercentage > 0 ? `${event.buyerPercentage.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %` : '-'}
+                          </td>
+                          <td className="hidden lg:table-cell px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 text-right">
                             {event.revenuePerParticipant > 0 ? `${event.revenuePerParticipant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €` : '-'}
                           </td>
                         </tr>
@@ -946,7 +1078,7 @@ export default function FullWidthDashboard() {
                         {isMobile && isExpanded && (
                           <tr className="bg-gray-50">
                             <td colSpan={6} className="px-2 sm:px-6 py-3 sm:py-4">
-                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                                 <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
                                   <p className="text-[8px] sm:text-xs text-gray-500">Acheteurs</p>
                                   <p className="text-xs sm:text-sm font-semibold text-gray-900">{event.buyers.toLocaleString('fr-FR')}</p>
@@ -958,6 +1090,10 @@ export default function FullWidthDashboard() {
                                 <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
                                   <p className="text-[8px] sm:text-xs text-gray-500">Participants</p>
                                   <p className="text-xs sm:text-sm font-semibold text-gray-900">{event.participants > 0 ? event.participants.toLocaleString('fr-FR') : '-'}</p>
+                                </div>
+                                <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
+                                  <p className="text-[8px] sm:text-xs text-gray-500">% Acheteurs</p>
+                                  <p className="text-xs sm:text-sm font-semibold text-gray-900">{event.buyerPercentage > 0 ? `${event.buyerPercentage.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} %` : '-'}</p>
                                 </div>
                                 <div className="bg-white p-2 sm:p-3 rounded-lg border border-gray-200">
                                   <p className="text-[8px] sm:text-xs text-gray-500">€ / coureur</p>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, Fragment } from 'react';
 import { clearAuthSession } from '@/lib/auth';
-import { fetchPastData, fetchNowData, fetchAliaseData, normalizeEventName } from '@/lib/googleSheets';
+import { fetchPastData, fetchNowData, fetchAliaseData, normalizeEventName, fetchRecordsData } from '@/lib/googleSheets';
+import { RecordData } from '@/types';
 import {
   TrendingUp,
   Users,
@@ -18,7 +19,11 @@ import {
   Eye,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Trophy,
+  Award,
+  Star,
+  X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,6 +74,8 @@ export default function FullWidthDashboard() {
   const [expandedEventIndex, setExpandedEventIndex] = useState<number | null>(null);
   const [sortColumn, setSortColumn] = useState<'ca' | 'buyers' | 'avgOrder' | 'participants' | 'revenuePerParticipant' | 'buyerPercentage' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [showRecordsModal, setShowRecordsModal] = useState(false);
+  const [records, setRecords] = useState<RecordData[]>([]);
   const itemsPerPage = 20;
 
   useEffect(() => {
@@ -90,11 +97,15 @@ export default function FullWidthDashboard() {
       setIsLoading(true);
       setError(null);
 
-      const [pastData, nowData, aliasMap] = await Promise.all([
+      const [pastData, nowData, aliasMap, recordsData] = await Promise.all([
         fetchPastData(),
         fetchNowData(),
         fetchAliaseData(),
+        fetchRecordsData(),
       ]);
+
+      // Stocker les records
+      setRecords(recordsData);
 
       const eventMap = new Map<string, {
         ca: number;
@@ -420,7 +431,7 @@ export default function FullWidthDashboard() {
 
   // Si une année est sélectionnée, afficher le détail des courses de cette année
   if (selectedYear) {
-    displayEvents = stats.allEvents.filter(event => {
+    displayEvents = (stats?.allEvents ?? []).filter(event => {
       const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase());
       const yearMatch = event.name.match(/20\d{2}/);
       const eventYear = yearMatch ? yearMatch[0] : '';
@@ -444,7 +455,7 @@ export default function FullWidthDashboard() {
       participants: number;
     }>();
 
-    stats.allEvents.forEach(event => {
+    (stats?.allEvents ?? []).forEach(event => {
       const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase());
 
       if (showTriathlonsOnly) {
@@ -492,7 +503,7 @@ export default function FullWidthDashboard() {
     })).sort((a, b) => b.name.localeCompare(a.name)); // Trier par année décroissante
   } else {
     // Affichage par course (mode normal)
-    displayEvents = stats.allEvents.filter(event => {
+    displayEvents = (stats?.allEvents ?? []).filter(event => {
       const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase());
 
       if (showTriathlonsOnly) {
@@ -616,13 +627,75 @@ export default function FullWidthDashboard() {
               </h1>
             </div>
 
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-600 hover:text-red-600">
-              <LogOut className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Déconnexion</span>
-            </Button>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowRecordsModal(true)}
+                className="bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300 text-yellow-700 hover:bg-yellow-100 hover:text-yellow-800 font-semibold"
+              >
+                <Trophy className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Records du site actuel</span>
+                <span className="sm:hidden">Records</span>
+              </Button>
+
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-600 hover:text-red-600">
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Déconnexion</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Modal Records */}
+      {showRecordsModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black bg-opacity-50" onClick={() => setShowRecordsModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full p-6 sm:p-8" onClick={(e) => e.stopPropagation()}>
+            {/* Header Modal */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <Trophy className="w-6 h-6 text-yellow-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Records du site actuel</h2>
+              </div>
+              <button
+                onClick={() => setShowRecordsModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Contenu des records */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {records.map((record, index) => {
+                // Déterminer l'icône en fonction du type
+                let Icon = Trophy;
+                if (record.type.toLowerCase().includes('journée')) {
+                  Icon = Star;
+                } else if (record.type.toLowerCase().includes('mois')) {
+                  Icon = Award;
+                }
+
+                return (
+                  <div key={index} className="bg-gradient-to-br from-yellow-50 to-amber-50 p-6 rounded-xl border-2 border-yellow-200 shadow-md hover:shadow-lg transition-shadow">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="p-2 bg-yellow-100 rounded-lg">
+                        <Icon className="w-5 h-5 text-yellow-600" />
+                      </div>
+                      <p className="text-sm font-semibold text-gray-700">{record.type}</p>
+                    </div>
+                    <p className="text-3xl font-bold text-gray-900 mb-2">{record.value}</p>
+                    <p className="text-sm text-gray-600">{record.detail}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -643,17 +716,17 @@ export default function FullWidthDashboard() {
               <div className="mb-3 pb-3 border-b border-red-200">
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
-                  {stats.currentYearCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                  {(stats?.currentYearCA ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                 </div>
-                <p className="text-[8px] sm:text-xs text-gray-500">{stats.currentYearOrders.toLocaleString('fr-FR')} cmd</p>
+                <p className="text-[8px] sm:text-xs text-gray-500">{(stats?.currentYearOrders ?? 0).toLocaleString('fr-FR')} cmd</p>
               </div>
               {/* Total */}
               <div>
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
-                  {stats.totalCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                  {(stats?.totalCA ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                 </div>
-                <p className="text-[8px] sm:text-xs text-gray-500">{stats.totalOrders.toLocaleString('fr-FR')} cmd</p>
+                <p className="text-[8px] sm:text-xs text-gray-500">{(stats?.totalOrders ?? 0).toLocaleString('fr-FR')} cmd</p>
               </div>
             </CardContent>
           </Card>
@@ -673,7 +746,7 @@ export default function FullWidthDashboard() {
               <div className="mb-3 pb-3 border-b border-green-200">
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
-                  {stats.currentYearBuyers.toLocaleString('fr-FR')}
+                  {(stats?.currentYearBuyers ?? 0).toLocaleString('fr-FR')}
                 </div>
                 <p className="text-[8px] sm:text-xs text-gray-500">Clients uniques</p>
               </div>
@@ -681,7 +754,7 @@ export default function FullWidthDashboard() {
               <div>
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
-                  {stats.totalBuyers.toLocaleString('fr-FR')}
+                  {(stats?.totalBuyers ?? 0).toLocaleString('fr-FR')}
                 </div>
                 <p className="text-[8px] sm:text-xs text-gray-500">Clients uniques</p>
               </div>
@@ -703,7 +776,7 @@ export default function FullWidthDashboard() {
               <div className="mb-3 pb-3 border-b border-blue-200">
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
-                  {stats.currentYearPanierMoyen.toFixed(0)} €
+                  {(stats?.currentYearPanierMoyen ?? 0).toFixed(0)} €
                 </div>
                 <p className="text-[8px] sm:text-xs text-gray-500">Par commande</p>
               </div>
@@ -711,7 +784,7 @@ export default function FullWidthDashboard() {
               <div>
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
-                  {stats.panierMoyen.toFixed(0)} €
+                  {(stats?.panierMoyen ?? 0).toFixed(0)} €
                 </div>
                 <p className="text-[8px] sm:text-xs text-gray-500">Par commande</p>
               </div>
@@ -733,20 +806,20 @@ export default function FullWidthDashboard() {
               <div className="mb-3 pb-3 border-b border-purple-200">
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">{new Date().getFullYear()}</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-900">
-                  {stats.currentYearEvents}
+                  {stats?.currentYearEvents ?? 0}
                 </div>
                 <p className="text-[8px] sm:text-xs text-gray-500">
-                  CA moy: {stats.currentYearEvents > 0 ? (stats.currentYearCA / stats.currentYearEvents).toLocaleString('fr-FR', { minimumFractionDigits: 0 }) : 0} €
+                  CA moy: {(stats?.currentYearEvents ?? 0) > 0 ? ((stats?.currentYearCA ?? 0) / (stats?.currentYearEvents ?? 1)).toLocaleString('fr-FR', { minimumFractionDigits: 0 }) : 0} €
                 </p>
               </div>
               {/* Total */}
               <div>
                 <p className="text-[8px] sm:text-xs text-gray-500 mb-1">Total</p>
                 <div className="text-sm sm:text-xl lg:text-2xl font-bold text-gray-700">
-                  {stats.nombreEvenements}
+                  {stats?.nombreEvenements ?? 0}
                 </div>
                 <p className="text-[8px] sm:text-xs text-gray-500">
-                  CA moy: {(stats.totalCA / stats.nombreEvenements).toLocaleString('fr-FR', { minimumFractionDigits: 0 })} €
+                  CA moy: {(stats?.nombreEvenements ?? 0) > 0 ? ((stats?.totalCA ?? 0) / (stats?.nombreEvenements ?? 1)).toLocaleString('fr-FR', { minimumFractionDigits: 0 }) : 0} €
                 </p>
               </div>
             </CardContent>
@@ -765,7 +838,7 @@ export default function FullWidthDashboard() {
                   </div>
                   <div className="text-left sm:text-right">
                     <div className="text-xl sm:text-2xl font-bold text-green-600">
-                      {stats.totalCA.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
+                      {(stats?.totalCA ?? 0).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} €
                     </div>
                     <div className="text-xs text-gray-500">Total actuel</div>
                   </div>

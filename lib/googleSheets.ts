@@ -1,4 +1,4 @@
-import { PastEventData, CurrentOrderData, NowEventData, AliasData } from '@/types';
+import { PastEventData, CurrentOrderData, NowEventData, AliasData, RecordData } from '@/types';
 
 const SPREADSHEET_ID = '1GOQpTXj6HG-_hoQb-TXG5rF6sZTHm8KLF5j1t2vGq7k';
 
@@ -10,6 +10,7 @@ const SHEETS = {
   CURRENT: '790186548',   // Feuille "Current"
   NOW: '722007554',       // Feuille "Now"
   ALIASE: '847386932',    // Feuille "Aliase"
+  RECORD: '1427424627',   // Feuille "Record"
 };
 
 /**
@@ -222,4 +223,26 @@ export function normalizeEventName(eventName: string, aliasMap: Map<string, stri
 
   // Ré-ajouter l'année si elle existait
   return year ? `${normalized} ${year}` : normalized;
+}
+
+/**
+ * Récupère les données de la feuille "Record"
+ * Format: type | value | detail
+ * Exemple: Journée record | 78 828 € | 12/05/2026
+ */
+export async function fetchRecordsData(): Promise<RecordData[]> {
+  try {
+    const data = await fetchSheetData(SHEETS.RECORD);
+
+    // Ignorer la première ligne (en-têtes)
+    return data.slice(1).map((row) => ({
+      type: row[0] || '',
+      value: row[1] || '',
+      detail: row[2] || ''
+    })).filter(record => record.type && record.value); // Filtrer les lignes vides
+  } catch (error) {
+    console.error('Error fetching records data:', error);
+    // Retourner un tableau vide si erreur
+    return [];
+  }
 }

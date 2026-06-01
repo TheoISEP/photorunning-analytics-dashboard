@@ -74,3 +74,9 @@ export interface DashboardMetrics {
   topEvents: AggregatedEventData[];
   recentEvents: AggregatedEventData[];
 }
+
+export interface RecordData {
+  type: string;
+  value: string;
+  detail: string;
+}
